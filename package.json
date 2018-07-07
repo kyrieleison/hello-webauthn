@@ -1,0 +1,14 @@
+{
+  "name": "hello-web-authentification-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Yuka Tsuboi <yuka.tsuboi@trustdock.io>",
+  "license": "MIT",
+  "dependencies": {
+    "koa": "^2.5.1",
+    "koa-static": "^5.0.0"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
