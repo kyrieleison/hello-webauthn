@@ -3,11 +3,14 @@ import crypto from 'crypto'
 import { encodeBase64 } from './src/js/utils/base64'
 
 const router = new Router
+const storage = new Map
 
 router.get('/credentials/new', (ctx, next) => {
   const username = ctx.request.query.username
 
   ctx.session.username = username
+  storage.set(username, { authenticators: new Map() })
+
   ctx.body = {
     rp: {
       name: 'Web Authentification API DEMO',
@@ -35,7 +38,12 @@ router.get('/credentials/new', (ctx, next) => {
 })
 
 router.post('/credentials', (ctx, next) => {
-  ctx.session.credentialId = ctx.params.credentialId
+  const username = ctx.session.username
+  const credentialId = ctx.request.body.id
+
+  const userinfo = storage.get(username).authenticators.set(credentialId, null)
+  storage.set(username, userinfo)
+
   ctx.body = { message: 'registered' }
 })
 
@@ -50,14 +58,18 @@ router.get('/sessions', (ctx, next) => {
 })
 
 router.get('/sessions/new', (ctx, next) => {
+  const username = ctx.request.query.username
+  const authenticators = storage.get(username).authenticators
+  const allowCredentials = Array.from(authenticators.keys()).map(id => {
+    return {
+      type: 'public-key',
+      id: encodeBase64(id)
+    }
+  })
+
   ctx.body = {
     challenge: encodeBase64(crypto.randomBytes(32)),
-    allowCredentials: [
-      {
-        type: 'public-key',
-        id: encodeBase64(ctx.session.credentialId),
-      }
-    ],
+    allowCredentials: allowCredentials,
     timeout: 10000,
   }
 })

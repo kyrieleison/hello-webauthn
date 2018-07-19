@@ -42,7 +42,8 @@ document.forms.register.addEventListener('submit', async (e) => {
   const registered = await fetchJSON('/credentials', {
     method: 'POST',
     credentials: 'include',
-    body: JSON.stringify({ credentialId: credential.id })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: credential.id })
   })
   console.log('registered: ', registered)
 
